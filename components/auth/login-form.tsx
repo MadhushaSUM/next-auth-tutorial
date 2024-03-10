@@ -19,8 +19,12 @@ import { FormError } from "@/components/form-error";
 import { FormSuccess } from "@/components/form-success";
 import { login } from "@/actions/login";
 import { useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
 
 export function LoginForm() {
+    const searchParams = useSearchParams();
+    const urlError = searchParams.get("error") === "OAuthAccountNotLinked" ? "Email already un use with different provider" : "";
+
     const [success, setSuccess] = useState<string | undefined>("");
     const [error, setError] = useState<string | undefined>("");
     const [isPending, startTransition] = useTransition();
@@ -39,7 +43,7 @@ export function LoginForm() {
         startTransition(async () => {
             const data = await login(values);
             setError(data.error);
-            setSuccess(data.success);       
+            setSuccess(data.success);
         });
     }
 
@@ -51,7 +55,7 @@ export function LoginForm() {
             showSocial
         >
             <Form {...form}>
-                <form 
+                <form
                     onSubmit={form.handleSubmit(onSubmit)}
                     className="space-y-6"
                 >
@@ -59,7 +63,7 @@ export function LoginForm() {
                         <FormField
                             control={form.control}
                             name="email"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
@@ -67,18 +71,18 @@ export function LoginForm() {
                                             {...field}
                                             disabled={isPending}
                                             placeholder="user@site.com"
-                                            type="email" 
+                                            type="email"
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            )} 
+                            )}
                         />
 
                         <FormField
                             control={form.control}
                             name="password"
-                            render={({field}) => (
+                            render={({ field }) => (
                                 <FormItem>
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
@@ -86,17 +90,17 @@ export function LoginForm() {
                                             {...field}
                                             disabled={isPending}
                                             placeholder="******"
-                                            type="password" 
+                                            type="password"
                                         />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
-                            )} 
+                            )}
                         />
                     </div>
 
-                    <FormError message={error}/>
-                    <FormSuccess message={success}/>
+                    <FormError message={error || urlError} />
+                    <FormSuccess message={success} />
                     <Button
                         type="submit"
                         disabled={isPending}
